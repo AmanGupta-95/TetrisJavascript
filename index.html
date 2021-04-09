@@ -1,18 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-        rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-    <title>Tetris</title>
-</head>
-<body>
-    
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="style.css" />
+		<title>Tetris</title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="left">
+				<h1 class="header">
+						<span>T</span>
+						<span>E</span>
+						<span>T</span>
+						<span>R</span>
+						<span>I</span>
+						<span>S</span>
+				</h1>
+				<div class="stats">
+					<p class="time">Time: 00:00:00</p>
+					<p class="topScore">Top Score: 0</p>
+					<p class="score">Score: 0</p>
+					<p class="level">Level: 1</p>
+				</div>
+				<div class="buttons">
+					<button class="btn pause">Pause</button><br />
+					<button class="btn sound">Sound</button><br />
+				</div>
+			</div>
+			<div class="mid">
+				<canvas class="my-canvas"></canvas>
+				<!-- <div class="game-condition">
+					<h4>Start Game</h4>
+					<p>press Space to start</p>
+				</div> -->
+			</div>
+			<div class="right">
+				<div class="next">
+					<h4>Next</h4>
+					<img
+						class="tetro-img"
+						src="resources/images/L.svg"
+						alt="Tetromino Image"
+					/>
+				</div>
+				<div class="controls">
+					<h4>Controls</h4>
+					<p>A: To move left</p>
+					<p>D: To move right</p>
+					<p>S: To move down</p>
+					<p>W: To rotate</p>
+				</div>
+			</div>
+		</div>
+		<audio class="theme" src="resources/theme.mp3" loop="loop"></audio>
+	</body>
+	<script src="tetris.js"></script>
 </html>
