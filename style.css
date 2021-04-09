@@ -1,0 +1,152 @@
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Press Start 2P', 'cursive';
+}
+
+.container {
+	height: 100vh;
+	background-image: linear-gradient(#a1c4fd 0%, rgba(194, 233, 251, 0.46) 100%);
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+}
+
+/*ADDING BORDER TO STATS, NEXT AND CONTROLS DIV*/
+.stats,
+.next,
+.controls {
+	border-radius: 5px;
+	border: 3px solid black;
+}
+
+/*CREATING A FLEX DISPLAY FOR LEFT AND RIGHT SIDE OF CANVAS*/
+.left,
+.right {
+	height: 90vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+/* STYLING THE MID */
+.mid {
+	text-align: center;
+	position: relative;
+}
+
+/*HEADER STYLE*/
+.header span {
+	text-shadow: 2px 2px 3px black;
+	font-size: 2rem;
+	/* fixing the spacing problem of span tag*/
+	float: left;
+	margin: 5px;
+}
+
+/* giving different color to each letter */
+.header span:nth-child(1) {
+	color: #23a148;
+}
+.header span:nth-child(2) {
+	color: #db98ae;
+}
+.header span:nth-child(3) {
+	color: #ee7828;
+}
+.header span:nth-child(4) {
+	color: #870116;
+}
+.header span:nth-child(5) {
+	color: #ece000;
+}
+.header span:nth-child(6) {
+	color: #008fcd;
+}
+
+.stats,
+.controls p {
+	font-size: 0.8rem;
+	text-align: left;
+}
+
+.stats p {
+	padding: 0.5rem;
+}
+
+/* STYLING BUTTONS */
+.buttons {
+	text-align: center;
+}
+
+.btn {
+	font-size: 0.8rem;
+	font-family: inherit;
+	margin-top: 1.5rem;
+	background-color: transparent;
+	border: 3px solid black;
+	border-radius: 5px;
+	padding: 0.5rem;
+	cursor: pointer;
+	outline: none;
+	box-shadow: 2px 2px black;
+	transition: all 0.2s;
+}
+
+.btn:active,
+.btn-active {
+	box-shadow: 0.5px 0.5px black;
+}
+
+/* STYLING CANVAS */
+.my-canvas {
+	border: 3px solid black;
+	border-radius: 5px;
+	height: 90vh;
+}
+
+/* STYLING TEXT THAT WILL APPEAR OVER THE CANVAS*/
+.game-condition {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	text-align: center;
+}
+
+.game-condition p {
+	margin-top: 1rem;
+	font-size: 0.8rem;
+	white-space: nowrap;
+}
+
+/*STYLING THE NEXT BLOCK*/
+.next {
+	text-align: center;
+	padding: 0.5rem;
+	width: 90%;
+}
+
+.tetro-img {
+	height: 6rem;
+	width: 6rem;
+	margin-top: 0.8rem;
+	transform: scale(0.8, 0.8);
+}
+
+/*STYLING CONTROLS BLOCK*/
+.controls {
+	padding: 0.5rem;
+}
+
+.controls h4 {
+	text-align: center;
+}
+
+.controls p {
+	margin-top: 1rem;
+}
