@@ -31,10 +31,11 @@ const init = () => {
 	//scaling the canvas elements
 	ctx.scale(20, 20);
 
-    draw();
+	//running the game
+	run();
 };
 
-/*************DRAWING THE BOARD AND TETROMINOS***************/
+/*************DRAWING THE BOARD AND TETROMINOS*************/
 
 /**
  * drawing the game board and tetrominos
@@ -77,10 +78,39 @@ const drawTetromino = () => {
 	});
 };
 
+/*************Game Run*************/
 
+//used to check when to drop the tetromino
+let dropCounter = 0;
+//used for how much time it take for tetromino to drop
+//1 sec = 1000 ms
+let timeForDrop = 1000;
+//used to store the previous time
+let prevTime = 0;
 
+/**
+ * creating animation by moving the tetromino inside the board
+ * @param {number} time The current time in millisecond
+ */
+const run = (time = 0) => {
+	//finding the difference between current and previous time
+	const deltaTime = time - prevTime;
 
+	//adding it to the drop counter
+	dropCounter += deltaTime;
 
+	//performing the drop if dropCounter is greater than time for drop
+	if (dropCounter > timeForDrop) {
+		tetromino.pos.y += 1;
+		dropCounter = 0;
+	}
+
+	//storing the current time
+	prevTime = time;
+
+	draw();
+	requestAnimationFrame(run);
+};
 
 ///////////////////////////////////////////
 /*testing methods*/
@@ -89,5 +119,7 @@ tetromino.currentTetro = [
 	[1, 1, 1],
 	[0, 1, 0],
 ];
+
+tetromino.pos.x = 5;
 
 init();
