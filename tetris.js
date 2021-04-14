@@ -78,6 +78,106 @@ const drawTetromino = () => {
 	});
 };
 
+/*************Tetromino Structure & Functions*************/
+
+/**
+ * Provide the shape of tetromino according to the given type
+ *
+ * @param {String} type Letter of the shape
+ * @returns {Number[][]} 2D array Representing the shape of tetromino
+ */
+const getTetromino = (type) => {
+	if (type === 'T') {
+		return [
+			[0, 0, 0],
+			[1, 1, 1],
+			[0, 1, 0],
+		];
+	} else if (type === 'O') {
+		return [
+			[2, 2],
+			[2, 2],
+		];
+	} else if (type === 'L') {
+		return [
+			[0, 3, 0],
+			[0, 3, 0],
+			[0, 3, 3],
+		];
+	} else if (type === 'J') {
+		return [
+			[0, 4, 0],
+			[0, 4, 0],
+			[4, 4, 0],
+		];
+	} else if (type === 'S') {
+		return [
+			[0, 5, 5],
+			[5, 5, 0],
+			[0, 0, 0],
+		];
+	} else if (type === 'Z') {
+		return [
+			[6, 6, 0],
+			[0, 6, 6],
+			[0, 0, 0],
+		];
+	} else if (type === 'I') {
+		return [
+			[0, 7, 0, 0],
+			[0, 7, 0, 0],
+			[0, 7, 0, 0],
+			[0, 7, 0, 0],
+		];
+	}
+};
+
+/**
+ * Moving the tetromino vertically
+ */
+const tetrominoDrop = () => {
+	//increasing the y value
+	tetromino.pos.y++;
+	//resetting the drop count
+	dropCounter = 0;
+};
+
+/**
+ * Moving the tetromino horizontally
+ * @param {Number} direction (+) Move right or (-) Move left
+ */
+const tetrominoMoveHorizontal = (direction) => {
+	//changing the x value according to direction
+	tetromino.pos.x += direction;
+};
+
+/**
+ * Rotate the tetromino matrix
+ * @param {Number[][]} tetromino The tetromino matrix
+ * @param {Number} direction (+) Rotate Clockwise (-) Rotate Anti-clockwise
+ */
+const rotate = (tetromino, direction) => {
+	//transposing the matrix
+	for (let y = 0; y < tetromino.length; y++) {
+		for (let x = 0; x < y; x++) {
+			[tetromino[x][y], tetromino[y][x]] = [tetromino[y][x], tetromino[x][y]];
+		}
+	}
+
+	//reversing each row in the matrix clockwise
+	if (direction > 0) tetromino.forEach((row) => row.reverse());
+	//reversing the matrix anti clockwise
+	else tetromino.reverse();
+};
+
+/**
+ *	Calling the rotate on current tetromino and check collision while rotating
+ *  * @param {Number} direction (+) Rotate Clockwise (-) Rotate Anti-clockwise
+ */
+const tetrominoRotate = (direction) => {
+	rotate(tetromino.currentTetro, direction);
+};
+
 /*************Game Run*************/
 
 //used to check when to drop the tetromino
@@ -101,8 +201,7 @@ const run = (time = 0) => {
 
 	//performing the drop if dropCounter is greater than time for drop
 	if (dropCounter > timeForDrop) {
-		tetromino.pos.y += 1;
-		dropCounter = 0;
+		tetrominoDrop();
 	}
 
 	//storing the current time
