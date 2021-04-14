@@ -21,6 +21,18 @@ let player = {
 	level: 1,
 };
 
+//colors array
+const colors = [
+	null,
+	'#23A148',
+	'#DB98AE',
+	'#EE7828',
+	'#870116',
+	'#008FCD',
+	'#9B469C',
+	'#ECE000',
+];
+
 //game board of size 20x13 for holding the tetrominos position
 const gameBoard = new Array(20).fill(0).map(() => new Array(13).fill(0));
 
@@ -43,7 +55,11 @@ const init = () => {
 const draw = () => {
 	ctx.beginPath();
 	ctx.fillStyle = '#E0ECFF';
+	//trail effect
+	if (keyPressed) ctx.globalAlpha = 0.1;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	//resetting alpha value
+	ctx.globalAlpha = 1;
 	drawBoard();
 	drawTetromino();
 };
@@ -56,7 +72,7 @@ const drawBoard = () => {
 		row.forEach((value, x) => {
 			if (value !== 0) {
 				ctx.beginPath();
-				ctx.fillStyle = 'green';
+				ctx.fillStyle = colors[value];
 				ctx.fillRect(x, y, 1, 1);
 			}
 		});
@@ -71,7 +87,7 @@ const drawTetromino = () => {
 		row.forEach((value, x) => {
 			if (value !== 0) {
 				ctx.beginPath();
-				ctx.fillStyle = 'green';
+				ctx.fillStyle = colors[value];
 				ctx.fillRect(x + tetromino.pos.x, y + tetromino.pos.y, 1, 1);
 			}
 		});
@@ -133,9 +149,19 @@ const getTetromino = (type) => {
 };
 
 /**
+ *
+ * @returns {String} Representing the letter of the tetromino
+ */
+const randomTetromino = () => {
+	const tetrominos = ['T', 'O', 'L', 'J', 'S', 'Z', 'I'];
+	const index = Math.floor(Math.random() * tetrominos.length);
+	return tetrominos[index];
+};
+
+/**
  * Moving the tetromino vertically
  */
-const tetrominoDrop = () => {
+const tetrominoMoveVertical = () => {
 	//increasing the y value
 	tetromino.pos.y++;
 	//resetting the drop count
@@ -175,8 +201,27 @@ const rotate = (tetromino, direction) => {
  *  * @param {Number} direction (+) Rotate Clockwise (-) Rotate Anti-clockwise
  */
 const tetrominoRotate = (direction) => {
+	//TODO detect if the are collision happening while rotating
 	rotate(tetromino.currentTetro, direction);
 };
+
+/*************Keyboard Interactions*************/
+
+//for trail effect
+let keyPressed = false;
+document.addEventListener('keyup', (e) => {
+	if (e.key === 's') keyPressed = false;
+});
+
+//handling key events
+document.addEventListener('keydown', (e) => {
+	if (e.key === 'a') tetrominoMoveHorizontal(-1);
+	else if (e.key === 'd') tetrominoMoveHorizontal(+1);
+	else if (e.key === 's') {
+		keyPressed = true;
+		tetrominoMoveVertical();
+	} else if (e.key === 'w') tetrominoRotate(+1);
+});
 
 /*************Game Run*************/
 
@@ -201,7 +246,7 @@ const run = (time = 0) => {
 
 	//performing the drop if dropCounter is greater than time for drop
 	if (dropCounter > timeForDrop) {
-		tetrominoDrop();
+		tetrominoMoveVertical();
 	}
 
 	//storing the current time
@@ -213,11 +258,7 @@ const run = (time = 0) => {
 
 ///////////////////////////////////////////
 /*testing methods*/
-tetromino.currentTetro = [
-	[0, 0, 0],
-	[1, 1, 1],
-	[0, 1, 0],
-];
+tetromino.currentTetro = getTetromino(randomTetromino());
 
 tetromino.pos.x = 5;
 
