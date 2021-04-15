@@ -10,7 +10,8 @@ const ctx = canvas.getContext('2d');
 //used for storing the current, next tetromino and its position
 let tetromino = {
 	currentTetro: null,
-	nextTetro: null,
+	currentTetroLetter: null,
+	nextTetroLetter: null,
 	pos: { x: 0, y: 0 },
 };
 
@@ -20,6 +21,9 @@ let player = {
 	highScore: 0,
 	level: 1,
 };
+
+//used for showing next tetromino
+const next = document.querySelector('.tetro-img');
 
 //colors array
 const colors = [
@@ -42,6 +46,9 @@ const gameBoard = new Array(20).fill(0).map(() => new Array(13).fill(0));
 const init = () => {
 	//scaling the canvas elements
 	ctx.scale(20, 20);
+
+	tetromino.nextTetroLetter = randomTetrominoLetter();
+	gameBoardReset();
 
 	//running the game
 	run();
@@ -92,6 +99,83 @@ const drawTetromino = () => {
 			}
 		});
 	});
+};
+
+/*************Game Board Interactions*************/
+
+/**
+ *Checking if the there is collision between tetrominos or game board boundaries
+ * @returns {Boolean} true if collision happened and false if not
+ */
+const collision = () => {
+	const [current, pos] = [tetromino.currentTetro, tetromino.pos];
+	for (let y = 0; y < current.length; y++) {
+		for (let x = 0; x < current[y].length; x++) {
+			//checking if the tetromino matrix non zero value is colliding with the game board matrix non zero value
+			if (
+				current[y][x] !== 0 &&
+				(gameBoard[y + pos.y] && gameBoard[y + pos.y][x + pos.x]) !== 0
+			)
+				return true;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * Adding tetromino to gameBoard matrix
+ */
+const addTetrominoToBoard = () => {
+	//looping through the tetromino array
+	tetromino.currentTetro.forEach((row, y) => {
+		row.forEach((value, x) => {
+			//adding all non zero value to gameBoard array
+			if (value !== 0)
+				gameBoard[y + tetromino.pos.y][x + tetromino.pos.x] = value;
+		});
+	});
+};
+
+/**
+ * Removing the completed lines from the game board array
+ */
+const gameBoardSweep = () => {
+	//checking if there is any completed lines
+	outer: for (let y = gameBoard.length - 1; y > 0; y--) {
+		for (let x = 0; x < gameBoard[y].length; x++) {
+			if (gameBoard[y][x] === 0) continue outer;
+		}
+		//removing that line from the game board matrix
+		const row = gameBoard.splice(y, 1)[0].fill(0);
+		//moving that line to the top of the matrix
+		gameBoard.unshift(row);
+		y++;
+	}
+};
+
+/**
+ * Resetting the game board after every tetromino drop is complete
+ */
+const gameBoardReset = () => {
+	//setting up the current and next tetromino
+	tetromino.currentTetroLetter = tetromino.nextTetroLetter;
+	tetromino.nextTetroLetter = randomTetrominoLetter();
+	tetromino.currentTetro = getTetromino(tetromino.currentTetroLetter);
+
+	//setting the next tetromino image
+	next.src = './resources/images/' + tetromino.nextTetroLetter + '.svg';
+
+	//adjusting the starting position of the tetromino
+	tetromino.pos.y = 0;
+	tetromino.pos.x =
+		((gameBoard[0].length / 2) | 0) -
+		((tetromino.currentTetro[0].length / 2) | 0);
+
+	//game over
+	if (collision()) {
+		gameBoard.forEach((row) => row.fill(0));
+	}
 };
 
 /*************Tetromino Structure & Functions*************/
@@ -152,7 +236,7 @@ const getTetromino = (type) => {
  *
  * @returns {String} Representing the letter of the tetromino
  */
-const randomTetromino = () => {
+const randomTetrominoLetter = () => {
 	const tetrominos = ['T', 'O', 'L', 'J', 'S', 'Z', 'I'];
 	const index = Math.floor(Math.random() * tetrominos.length);
 	return tetrominos[index];
@@ -164,6 +248,14 @@ const randomTetromino = () => {
 const tetrominoMoveVertical = () => {
 	//increasing the y value
 	tetromino.pos.y++;
+
+	if (collision()) {
+		tetromino.pos.y--;
+		addTetrominoToBoard();
+		gameBoardReset();
+		gameBoardSweep();
+	}
+
 	//resetting the drop count
 	dropCounter = 0;
 };
@@ -175,6 +267,10 @@ const tetrominoMoveVertical = () => {
 const tetrominoMoveHorizontal = (direction) => {
 	//changing the x value according to direction
 	tetromino.pos.x += direction;
+
+	//stop horizontal movement when collision happens
+	//with game board boundary or other tetromino
+	if (collision()) tetromino.pos.x -= direction;
 };
 
 /**
@@ -201,8 +297,20 @@ const rotate = (tetromino, direction) => {
  *  * @param {Number} direction (+) Rotate Clockwise (-) Rotate Anti-clockwise
  */
 const tetrominoRotate = (direction) => {
-	//TODO detect if the are collision happening while rotating
 	rotate(tetromino.currentTetro, direction);
+
+	//when rotation causes collision
+	const posX = tetromino.pos.x;
+	let offset = 1;
+	while (collision()) {
+		tetromino.pos.x += offset;
+		offset = -(offset + (offset > 0 ? 1 : -1));
+		if (offset > tetromino.currentTetro[0].length) {
+			rotate(tetromino.currentTetro, -direction);
+			tetromino.pos.x = posX;
+			return;
+		}
+	}
 };
 
 /*************Keyboard Interactions*************/
@@ -258,8 +366,5 @@ const run = (time = 0) => {
 
 ///////////////////////////////////////////
 /*testing methods*/
-tetromino.currentTetro = getTetromino(randomTetromino());
-
-tetromino.pos.x = 5;
 
 init();
