@@ -171,6 +171,9 @@ const gameBoardReset = () => {
 	tetromino.pos.x =
 		((gameBoard[0].length / 2) | 0) -
 		((tetromino.currentTetro[0].length / 2) | 0);
+	const letter = tetromino.currentTetroLetter;
+	//adjusting the position of the 'O' and 'I' tetrominos
+	if (letter === 'O' || letter === 'I') tetromino.pos.x++;
 
 	//game over
 	if (collision()) {
