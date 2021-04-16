@@ -50,6 +50,8 @@ const init = () => {
 	tetromino.nextTetroLetter = randomTetrominoLetter();
 	gameBoardReset();
 
+	timer();
+
 	//running the game
 	run();
 };
@@ -178,6 +180,7 @@ const gameBoardReset = () => {
 	//game over
 	if (collision()) {
 		gameBoard.forEach((row) => row.fill(0));
+		resetTime();
 	}
 };
 
@@ -333,6 +336,57 @@ document.addEventListener('keydown', (e) => {
 		tetrominoMoveVertical();
 	} else if (e.key === 'w') tetrominoRotate(+1);
 });
+
+/*************Statistics Functions*************/
+let sec = 0;
+let min = 0;
+let hr = 0;
+
+/**
+ * To show game run time
+ */
+const timer = () => {
+	sec = parseInt(sec);
+	min = parseInt(min);
+	hr = parseInt(hr);
+
+	sec = sec + 1;
+
+	if (sec == 60) {
+		min = min + 1;
+		sec = 0;
+	}
+	if (min == 60) {
+		hr = hr + 1;
+		min = 0;
+		sec = 0;
+	}
+
+	if (sec < 10 || sec == 0) {
+		sec = '0' + sec;
+	}
+	if (min < 10 || min == 0) {
+		min = '0' + min;
+	}
+	if (hr < 10 || hr == 0) {
+		hr = '0' + hr;
+	}
+
+	document.querySelector('.time').textContent =
+		'Time: ' + hr + ':' + min + ':' + sec;
+
+	setTimeout('timer()', 1000);
+};
+
+/**
+ * Resetting the timer
+ */
+const resetTime = () => {
+	sec = 0;
+	min = 0;
+	hr = 0;
+	document.querySelector('.time').textContent = 'Time: 00:00:00';
+};
 
 /*************Game Run*************/
 
