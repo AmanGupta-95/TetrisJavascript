@@ -139,10 +139,14 @@ const addTetrominoToBoard = () => {
 	});
 };
 
+//for increasing level
+let levelScore = 0;
 /**
  * Removing the completed lines from the game board array
  */
 const gameBoardSweep = () => {
+	//for checking how many lines are completed
+	let linesCleared = 0;
 	//checking if there is any completed lines
 	outer: for (let y = gameBoard.length - 1; y > 0; y--) {
 		for (let x = 0; x < gameBoard[y].length; x++) {
@@ -153,6 +157,18 @@ const gameBoardSweep = () => {
 		//moving that line to the top of the matrix
 		gameBoard.unshift(row);
 		y++;
+		linesCleared++;
+		levelScore += 10;
+	}
+	//adding score 10 points for each line
+	player.score += linesCleared * 10;
+	//updating level after each 50 points scored
+	if (levelScore >= 50) {
+		levelScore = 0;
+		player.level += 1;
+		//reducing the timer by 200 millisecond after each level increase
+		timeForDrop -= 200;
+		updateLevel();
 	}
 };
 
@@ -181,6 +197,11 @@ const gameBoardReset = () => {
 	if (collision()) {
 		gameBoard.forEach((row) => row.fill(0));
 		resetTime();
+		updateHighScore();
+		//resetting player values after game data
+		player.score = 0;
+		player.level = 1;
+		levelScore = 0;
 	}
 };
 
@@ -260,6 +281,7 @@ const tetrominoMoveVertical = () => {
 		addTetrominoToBoard();
 		gameBoardReset();
 		gameBoardSweep();
+		updateScore();
 	}
 
 	//resetting the drop count
@@ -386,6 +408,32 @@ const resetTime = () => {
 	min = 0;
 	hr = 0;
 	document.querySelector('.time').textContent = 'Time: 00:00:00';
+};
+
+/**
+ * Updating score value in html dom element
+ */
+const updateScore = () => {
+	document.querySelector('.score').textContent = 'Score: ' + player.score;
+};
+
+/**
+ * Updating highscore value in html dom element
+ */
+const updateHighScore = () => {
+	//checking if the score is greater than highscore or not
+	if (player.score > player.highScore) {
+		player.highScore = player.score;
+		document.querySelector('.topScore').textContent =
+			'Top Score: ' + player.highScore;
+	}
+};
+
+/**
+ * Updating level value in html dom element
+ */
+const updateLevel = () => {
+	document.querySelector('.level').textContent = 'Level: ' + player.level;
 };
 
 /*************Game Run*************/
