@@ -25,6 +25,15 @@ let player = {
 //used for showing next tetromino
 const next = document.querySelector('.tetro-img');
 
+// used for accessing pause button
+const pauseBtn = document.querySelector('.pause');
+
+//used for main header text inside the game canvas
+const gameHeader = document.querySelector('.game-condition h4');
+
+//used for sub header text inside the game canvas
+const gameSubHeader = document.querySelector('.game-condition p');
+
 //colors array
 const colors = [
 	null,
@@ -368,6 +377,9 @@ let hr = 0;
  * To show game run time
  */
 const timer = () => {
+	//when game is paused
+	if (isPause) return;
+
 	sec = parseInt(sec);
 	min = parseInt(min);
 	hr = parseInt(hr);
@@ -436,6 +448,34 @@ const updateLevel = () => {
 	document.querySelector('.level').textContent = 'Level: ' + player.level;
 };
 
+/*************Button Interaction*************/
+let isPause = false;
+pauseBtn.addEventListener('click', () => {
+	if (isPause) {
+		isPause = false;
+		run();
+		timer();
+		removeHeaders();
+	} else {
+		setHeaders('Paused', '');
+		isPause = true;
+	}
+});
+
+/*************Game Headers*************/
+
+const setHeaders = (header, subHeader) => {
+	gameHeader.textContent = header;
+	gameSubHeader.textContent = subHeader;
+	canvas.style.filter = 'blur(2px)';
+};
+
+const removeHeaders = () => {
+	gameHeader.textContent = '';
+	gameSubHeader.textContent = '';
+	canvas.style.filter = 'blur(0)';
+};
+
 /*************Game Run*************/
 
 //used to check when to drop the tetromino
@@ -451,6 +491,9 @@ let prevTime = 0;
  * @param {number} time The current time in millisecond
  */
 const run = (time = 0) => {
+	//when game is paused
+	if (isPause) return;
+
 	//finding the difference between current and previous time
 	const deltaTime = time - prevTime;
 
