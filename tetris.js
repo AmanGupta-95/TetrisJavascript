@@ -202,15 +202,11 @@ const gameBoardReset = () => {
 	//adjusting the position of the 'O' and 'I' tetrominos
 	if (letter === 'O' || letter === 'I') tetromino.pos.x++;
 
-	//game over
+	//if collision happened just after a tetromino was added
+	//call game over
 	if (collision()) {
-		gameBoard.forEach((row) => row.fill(0));
-		resetTime();
-		updateHighScore();
-		//resetting player values after game data
-		player.score = 0;
-		player.level = 1;
-		levelScore = 0;
+		isGameOver = true;
+		gameOver();
 	}
 };
 
@@ -355,11 +351,13 @@ const tetrominoRotate = (direction) => {
 //for trail effect
 let keyPressed = false;
 document.addEventListener('keyup', (e) => {
+	if (isPause || isGameOver) return;
 	if (e.key === 's') keyPressed = false;
 });
 
 //handling key events
 document.addEventListener('keydown', (e) => {
+	if (isPause || isGameOver) return;
 	if (e.key === 'a') tetrominoMoveHorizontal(-1);
 	else if (e.key === 'd') tetrominoMoveHorizontal(+1);
 	else if (e.key === 's') {
@@ -377,8 +375,8 @@ let hr = 0;
  * To show game run time
  */
 const timer = () => {
-	//when game is paused
-	if (isPause) return;
+	//when game is paused or game over
+	if (isPause || isGameOver) return;
 
 	sec = parseInt(sec);
 	min = parseInt(min);
@@ -450,6 +448,10 @@ const updateLevel = () => {
 
 /*************Button Interaction*************/
 let isPause = false;
+
+/**
+ * Pausing the game
+ */
 pauseBtn.addEventListener('click', () => {
 	if (isPause) {
 		isPause = false;
@@ -464,16 +466,47 @@ pauseBtn.addEventListener('click', () => {
 
 /*************Game Headers*************/
 
+/**
+ * Setting the header of the game
+ * @param {String} header Main header
+ * @param {String} subHeader Sub Header
+ */
 const setHeaders = (header, subHeader) => {
 	gameHeader.textContent = header;
 	gameSubHeader.textContent = subHeader;
+	//setting the blur effect
 	canvas.style.filter = 'blur(2px)';
 };
 
+/**
+ * Removing the headers from the canvas
+ */
 const removeHeaders = () => {
 	gameHeader.textContent = '';
 	gameSubHeader.textContent = '';
 	canvas.style.filter = 'blur(0)';
+};
+
+/*************Game Over*************/
+
+let isGameOver = false;
+const gameOver = () => {
+	setHeaders('Game Over', 'Press Enter to restart');
+	document.addEventListener('keydown', (e) => {
+		if (e.code === 'Enter' && isGameOver) {
+			gameBoard.forEach((row) => row.fill(0));
+			player.score = 0;
+			player.level = 1;
+			isGameOver = false;
+			updateHighScore();
+			updateScore();
+			updateLevel();
+			resetTime();
+			removeHeaders();
+			run();
+			timer();
+		}
+	});
 };
 
 /*************Game Run*************/
@@ -492,7 +525,7 @@ let prevTime = 0;
  */
 const run = (time = 0) => {
 	//when game is paused
-	if (isPause) return;
+	if (isPause || isGameOver) return;
 
 	//finding the difference between current and previous time
 	const deltaTime = time - prevTime;
