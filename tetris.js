@@ -175,8 +175,12 @@ const gameBoardSweep = () => {
 	if (levelScore >= 50) {
 		levelScore = 0;
 		player.level += 1;
-		//reducing the timer by 200 millisecond after each level increase
-		timeForDrop -= 200;
+		//reducing the time to drop by 200 millisecond after each level increase
+		if (player.level <= 5) timeForDrop -= 200;
+		else {
+			//reducing it with 20 millisecond after level 5
+			timeForDrop -= 20;
+		}
 		updateLevel();
 	}
 };
