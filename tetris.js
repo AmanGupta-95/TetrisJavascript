@@ -7,6 +7,9 @@ canvas.height = 400;
 //canvas context
 const ctx = canvas.getContext('2d');
 
+//used for checking if this is a fresh start
+let isGameStart = true;
+
 //used for storing the current, next tetromino and its position
 let tetromino = {
 	currentTetro: null,
@@ -28,11 +31,30 @@ const next = document.querySelector('.tetro-img');
 // used for accessing pause button
 const pauseBtn = document.querySelector('.pause');
 
+// used for accessing sound button
+const soundBtn = document.querySelector('.sound');
+
 //used for main header text inside the game canvas
 const gameHeader = document.querySelector('.game-condition h4');
 
 //used for sub header text inside the game canvas
 const gameSubHeader = document.querySelector('.game-condition p');
+
+//used for accessing audio
+const theme = new Audio('./resources/sounds/theme.mp3');
+const tetroDropAudio = new Audio('./resources/sounds/rotate.mp3');
+const gameOverAudio = new Audio('./resources/sounds/gameover.mp3');
+const lineRemoveAudio = new Audio('./resources/sounds/line-removal.mp3');
+const pauseAudio = new Audio('./resources/sounds/pause.mp3');
+
+//sued for holding all the audios
+const audios = [
+	theme,
+	tetroDropAudio,
+	gameOverAudio,
+	lineRemoveAudio,
+	pauseAudio,
+];
 
 //colors array
 const colors = [
@@ -49,21 +71,23 @@ const colors = [
 //game board of size 20x13 for holding the tetrominos position
 const gameBoard = new Array(20).fill(0).map(() => new Array(13).fill(0));
 
-/**
- * Initialize the game
- */
-const init = () => {
-	//scaling the canvas elements
-	ctx.scale(20, 20);
+// /**
+//  * Initialize the game
+//  */
+// const init = () => {
+// 	//scaling the canvas elements
+// 	ctx.scale(20, 20);
 
-	tetromino.nextTetroLetter = randomTetrominoLetter();
-	gameBoardReset();
+// 	tetromino.nextTetroLetter = randomTetrominoLetter();
+// 	gameBoardReset();
 
-	timer();
+// 	timer();
 
-	//running the game
-	run();
-};
+// 	soundPlay();
+
+// 	//running the game
+// 	run();
+// };
 
 /*************DRAWING THE BOARD AND TETROMINOS*************/
 
@@ -168,6 +192,7 @@ const gameBoardSweep = () => {
 		y++;
 		linesCleared++;
 		levelScore += 10;
+		lineRemoveAudio.play();
 	}
 	//adding score 10 points for each line
 	player.score += linesCleared * 10;
@@ -282,6 +307,8 @@ const randomTetrominoLetter = () => {
  * Moving the tetromino vertically
  */
 const tetrominoMoveVertical = () => {
+	tetroDropAudio.play();
+
 	//increasing the y value
 	tetromino.pos.y++;
 
@@ -302,6 +329,8 @@ const tetrominoMoveVertical = () => {
  * @param {Number} direction (+) Move right or (-) Move left
  */
 const tetrominoMoveHorizontal = (direction) => {
+	tetroDropAudio.play();
+
 	//changing the x value according to direction
 	tetromino.pos.x += direction;
 
@@ -334,6 +363,8 @@ const rotate = (tetromino, direction) => {
  *  * @param {Number} direction (+) Rotate Clockwise (-) Rotate Anti-clockwise
  */
 const tetrominoRotate = (direction) => {
+	tetroDropAudio.play();
+
 	rotate(tetromino.currentTetro, direction);
 
 	//when rotation causes collision
@@ -362,12 +393,19 @@ document.addEventListener('keyup', (e) => {
 //handling key events
 document.addEventListener('keydown', (e) => {
 	if (isPause || isGameOver) return;
+
+	//when 'a' is pressed
 	if (e.key === 'a') tetrominoMoveHorizontal(-1);
+	//when 'd' is pressed
 	else if (e.key === 'd') tetrominoMoveHorizontal(+1);
+	//when 's' is pressed
 	else if (e.key === 's') {
 		keyPressed = true;
 		tetrominoMoveVertical();
-	} else if (e.key === 'w') tetrominoRotate(+1);
+	}
+
+	//when 'w' is pressed
+	else if (e.key === 'w') tetrominoRotate(+1);
 });
 
 /*************Statistics Functions*************/
@@ -457,14 +495,28 @@ let isPause = false;
  * Pausing the game
  */
 pauseBtn.addEventListener('click', () => {
+	pauseAudio.play();
 	if (isPause) {
 		isPause = false;
+		theme.play();
 		run();
 		timer();
 		removeHeaders();
 	} else {
 		setHeaders('Paused', '');
+		theme.pause();
 		isPause = true;
+	}
+});
+
+let isSound = true;
+soundBtn.addEventListener('click', () => {
+	if (isSound) {
+		isSound = false;
+		soundOff();
+	} else {
+		isSound = true;
+		soundOn();
 	}
 });
 
@@ -491,26 +543,43 @@ const removeHeaders = () => {
 	canvas.style.filter = 'blur(0)';
 };
 
+/*************Audio Functions*************/
+
+/**
+ * for playing theme sound
+ */
+const soundPlay = () => {
+	theme.play();
+	theme.volume = 0.3;
+	theme.loop = true;
+};
+
+/**
+ * mute all the audios
+ */
+const soundOff = () => {
+	audios.forEach((e) => {
+		e.muted = true;
+	});
+};
+
+/**
+ * unmute all the audios
+ */
+const soundOn = () => {
+	audios.forEach((e) => {
+		e.muted = false;
+	});
+};
+
 /*************Game Over*************/
 
 let isGameOver = false;
 const gameOver = () => {
+	theme.pause();
+	gameOverAudio.play();
 	setHeaders('Game Over', 'Press Enter to restart');
-	document.addEventListener('keydown', (e) => {
-		if (e.code === 'Enter' && isGameOver) {
-			gameBoard.forEach((row) => row.fill(0));
-			player.score = 0;
-			player.level = 1;
-			isGameOver = false;
-			updateHighScore();
-			updateScore();
-			updateLevel();
-			resetTime();
-			removeHeaders();
-			run();
-			timer();
-		}
-	});
+	pauseBtn.disabled = true;
 };
 
 /*************Game Run*************/
@@ -550,6 +619,36 @@ const run = (time = 0) => {
 };
 
 ///////////////////////////////////////////
-/*testing methods*/
 
-init();
+/**
+ * Starting the game
+ */
+window.addEventListener('load', () => {
+	setHeaders('Start Game', 'Press Enter to start');
+	ctx.scale(20, 20);
+	tetromino.nextTetroLetter = randomTetrominoLetter();
+	gameBoardReset();
+	pauseBtn.disabled = true;
+
+	//when 'Enter' is pressed
+	document.addEventListener('keydown', (e) => {
+		if (e.code === 'Enter' && (isGameOver || isGameStart)) {
+			//removing all tetrominos from the game board
+			gameBoard.forEach((row) => row.fill(0));
+			//resetting and updating all data all data
+			player.score = 0;
+			player.level = 1;
+			isGameOver = false;
+			isGameStart = false;
+			pauseBtn.disabled = false;
+			soundPlay();
+			updateHighScore();
+			updateScore();
+			updateLevel();
+			resetTime();
+			removeHeaders();
+			run();
+			timer();
+		}
+	});
+});
