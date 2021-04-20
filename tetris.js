@@ -235,6 +235,8 @@ const gameBoardReset = () => {
 	//call game over
 	if (collision()) {
 		isGameOver = true;
+		//updating high score
+		updateHighScore();
 		gameOver();
 	}
 };
@@ -642,7 +644,6 @@ window.addEventListener('load', () => {
 			isGameStart = false;
 			pauseBtn.disabled = false;
 			soundPlay();
-			updateHighScore();
 			updateScore();
 			updateLevel();
 			resetTime();
