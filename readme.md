@@ -4,7 +4,7 @@ Tetris is a tile matching video game in which random shaped tile drop from the t
 
 ## How to run
 
-1. Click [here](https://yeahitsaman.github.io/TetrisJavascript/) to start the game
+1. Click [here](https://amangupta-95.github.io/TetrisJavascript/) to start the game
 2. You can fork or clone this project and open index.html
 
 ## Features
